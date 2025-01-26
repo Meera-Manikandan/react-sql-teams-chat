@@ -9,7 +9,7 @@ function Welcome() {
     <div className="welcome-container">
       <header className="welcome-header">
         <img
-          src="/vite.svg"
+          src="/icon.svg"
           alt="Company Logo"
           className="welcome-logo"
         />

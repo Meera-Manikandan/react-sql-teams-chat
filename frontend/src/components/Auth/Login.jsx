@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { validateEmail, validatePassword } from '../../utils/validation';
 import '../../styles/Auth.css';
@@ -9,25 +10,42 @@ function Login() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    setError('');
+  
     if (!validateEmail(email)) {
       setError('Invalid email format');
       return;
     }
-
+  
     if (!validatePassword(password)) {
       setError('Password must be at least 6 characters long');
       return;
     }
-
-    // Using mock for now
-    if (email === 'user@example.com' && password === 'password123') {
-      localStorage.setItem('user', JSON.stringify({ email }));
-      navigate('/dashboard');
-    } else {
-      setError('Invalid email or password');
+  
+    try {
+      const response = await axios.post('http://localhost:5001/auth/login', {
+        email,
+        password,
+      });
+  
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+  
+        if (response.data.user) {
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+        } else {
+          localStorage.setItem('user', JSON.stringify({ username: 'Guest' }));
+        }
+  
+        navigate('/dashboard');
+      } else {
+        throw new Error('Invalid server response');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Something went wrong');
     }
-  };
+  };  
 
   return (
     <div className="auth-container">

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import users from '../../mocks/users.json';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import '../../styles/Auth.css';
 
 function SignUp() {
   const [username, setUsername] = useState('');
@@ -9,15 +10,20 @@ function SignUp() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSignup = () => {
-    const userExists = users.find((u) => u.email === email);
+  const handleSignup = async () => {
+    setError('');
 
-    if (userExists) {
-      setError('User already exists');
-    } else {
-      const newUser = { id: users.length + 1, username, email, password };
-      localStorage.setItem('user', JSON.stringify(newUser));
+    try {
+      const response = await axios.post('http://localhost:5001/auth/signup', {
+        username,
+        email,
+        password,
+      });
+
+      localStorage.setItem('token', response.data.token);
       navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to sign up');
     }
   };
 
