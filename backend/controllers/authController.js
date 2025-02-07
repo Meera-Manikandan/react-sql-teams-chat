@@ -74,3 +74,22 @@ exports.login = (req, res) => {
     }
   );
 };
+
+exports.deleteUser = (req, res) => {
+  const userId = req.body.id; // User ID sent from frontend
+
+  if (!userId) {
+    return res.status(400).json({ error: "User ID is required" });
+  }
+
+  db.query("DELETE FROM users WHERE id = ?", [userId], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Database error" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "User deleted successfully" });
+  });
+};
