@@ -8,7 +8,8 @@ function Dashboard() {
   const [posts, setPosts] = useState([]);
   const [postContent, setPostContent] = useState("");
   const [image, setImage] = useState(null);
-  const [readPosts, setReadPosts] = useState([]);
+  const [editingPost, setEditingPost] = useState(null);
+  const [editContent, setEditContent] = useState("");
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -21,7 +22,7 @@ function Dashboard() {
     try {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
-      fetchPosts();
+      fetchPosts(parsedUser.id);
     } catch (error) {
       console.error("Failed to parse user data:", error);
       localStorage.removeItem("user");
@@ -29,23 +30,28 @@ function Dashboard() {
     }
   }, [navigate]);
 
-  // Fetch all posts
-  const fetchPosts = async () => {
+  const fetchPosts = async (userId) => {
     try {
-      const response = await fetch("http://localhost:5001/posts/get-posts");
+      const response = await fetch("http://localhost:5001/posts");
       const data = await response.json();
-      setPosts(data);
+
+      const updatedPosts = data.map((post) => ({
+        ...post,
+        //read: post.readBy?.includes(userId) || false,
+        read: post.read_status === 1, // This will correctly set the read status
+        liked: post.likes?.includes(userId) || false,
+      }));
+
+      setPosts(updatedPosts);
     } catch (error) {
       console.error("Error fetching posts:", error);
     }
   };
 
-  // Handle file selection
   const handleFileChange = (e) => {
     setImage(e.target.files[0]);
   };
 
-  // Handle post submission
   const handlePostSubmit = async (e) => {
     e.preventDefault();
 
@@ -65,7 +71,7 @@ function Dashboard() {
         alert(data.message);
         setPostContent("");
         setImage(null);
-        fetchPosts();
+        fetchPosts(user.id);
       } else {
         alert(data.error || "Failed to create post");
       }
@@ -74,18 +80,17 @@ function Dashboard() {
     }
   };
 
-  // Handle post deletion
   const handleDeletePost = async (postId) => {
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
+
     try {
-      const response = await fetch(
-        `http://localhost:5001/posts/delete-post/${postId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`http://localhost:5001/posts/${postId}`, {
+        method: "DELETE",
+      });
 
       if (response.ok) {
-        fetchPosts();
+        alert("Post deleted successfully");
+        fetchPosts(user.id);
       } else {
         alert("Failed to delete post");
       }
@@ -94,19 +99,66 @@ function Dashboard() {
     }
   };
 
-  // Handle Like/Dislike
-  const handleLike = async (postId) => {
-    await fetch(`http://localhost:5001/posts/like/${postId}`, {
-      method: "POST",
-    });
-    fetchPosts();
+  const handleToggleLike = async (postId) => {
+    try {
+      await fetch(`http://localhost:5001/posts/toggle-like/${postId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: user.id }),
+      });
+
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId ? { ...post, liked: !post.liked } : post
+        )
+      );
+    } catch (error) {
+      console.error("Error toggling like:", error);
+    }
   };
 
-  const handleDislike = async (postId) => {
-    await fetch(`http://localhost:5001/posts/dislike/${postId}`, {
-      method: "POST",
-    });
-    fetchPosts();
+  const handleMarkAsRead = async (postId, userId) => {
+    try {
+      await fetch(`http://localhost:5001/posts/mark-read/${postId}/${userId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId ? { ...post, read: true } : post
+        )
+      );
+    } catch (error) {
+      console.error("Error marking post as read:", error);
+    }
+  };
+
+  const handleEditPost = (post) => {
+    setEditingPost(post.id);
+    setEditContent(post.content);
+  };
+
+  const handleSaveEdit = async (postId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5001/posts/modify-post/${postId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content: editContent }),
+        }
+      );
+
+      if (response.ok) {
+        setEditingPost(null);
+        fetchPosts(user.id);
+      } else {
+        alert("Failed to update post");
+      }
+    } catch (error) {
+      console.error("Error updating post:", error);
+    }
   };
 
   return (
@@ -130,45 +182,47 @@ function Dashboard() {
         {posts.map((post) => (
           <div
             key={post.id}
-            className={`post-card ${
-              !readPosts.includes(post.id) ? "unread" : ""
-            }`}
-            onClick={() => setReadPosts([...readPosts, post.id])}
+            className={`post-card ${post.read ? "read" : "unread"}`}
+            onClick={() => handleMarkAsRead(post.id, post.user_id)}
           >
             <h4>{post.username}</h4>
-            <p>{post.content}</p>
-            {post.image_url && (
-              <img
-                src={`http://localhost:5001${post.image_url}`}
-                alt="User Upload"
-              />
+            {editingPost === post.id ? (
+              <div>
+                <textarea
+                  value={editContent}
+                  onChange={(e) => setEditContent(e.target.value)}
+                />
+                <button onClick={() => handleSaveEdit(post.id)}>Save</button>
+              </div>
+            ) : (
+              <>
+                <p>{post.content}</p>
+                {post.image_url && (
+                  <img
+                    src={`http://localhost:5001${post.image_url}`}
+                    alt="User Upload"
+                    className="post-image"
+                  />
+                )}
+              </>
             )}
             <small>{new Date(post.created_at).toLocaleString()}</small>
 
-            {/* Like/Dislike & Delete */}
             <div className="post-actions">
-              <div className="like-dislike">
-                <button onClick={() => handleLike(post.id)}>
-                  👍 {post.likes}
-                </button>
-                <button onClick={() => handleDislike(post.id)}>
-                  👎 {post.dislikes}
-                </button>
-              </div>
-              {post.user_id === user.id && (
-                <button
-                  className="delete-btn"
-                  onClick={() => handleDeletePost(post.id)}
-                >
-                  Delete
-                </button>
+              <span onClick={() => handleToggleLike(post.id)}>
+                {post.liked ? "Liked" : "Like"}
+              </span>
+              {user?.id === post.user_id && (
+                <>
+                  <span onClick={() => handleEditPost(post)}>Modify</span>
+                  <span onClick={() => handleDeletePost(post.id)}>Delete</span>
+                </>
               )}
             </div>
           </div>
         ))}
       </div>
 
-      {/* Sign Out & Delete Account */}
       <div className="logout-container">
         <button onClick={() => navigate("/")}>Delete Account</button>
         <button
