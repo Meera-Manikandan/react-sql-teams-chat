@@ -37,8 +37,7 @@ function Dashboard() {
 
       const updatedPosts = data.map((post) => ({
         ...post,
-        //read: post.readBy?.includes(userId) || false,
-        read: post.read_status === 1, // This will correctly set the read status
+        read: post.read_status === 1,
         liked: post.likes?.includes(userId) || false,
       }));
 
@@ -161,6 +160,27 @@ function Dashboard() {
     }
   };
 
+  // Handle account deletion
+  const handleDeleteAccount = async () => {
+    if (window.confirm("Are you sure you want to delete your account?")) {
+      try {
+        const response = await fetch(`http://localhost:5001/users/${user.id}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          alert("Account deleted successfully");
+          localStorage.clear();
+          navigate("/login");
+        } else {
+          alert("Failed to delete account");
+        }
+      } catch (error) {
+        console.error("Error deleting account:", error);
+      }
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <h1>Welcome, {user?.username || "Guest"}!</h1>
@@ -224,8 +244,10 @@ function Dashboard() {
       </div>
 
       <div className="logout-container">
-        <button onClick={() => navigate("/")}>Delete Account</button>
-        <button
+        <button className="delete-btn" onClick={handleDeleteAccount}>
+          Delete Account
+        </button>
+        <button className="logout-btn"
           onClick={() => {
             localStorage.clear();
             navigate("/");

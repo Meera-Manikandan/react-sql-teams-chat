@@ -1,36 +1,36 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import '../../styles/Auth.css';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import "../../styles/Auth.css";
 
 function SignUp() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSignup = async () => {
-    setError('');
+    setError("");
 
     try {
-      const response = await axios.post('http://localhost:5001/auth/signup', {
+      const response = await axios.post("http://localhost:5001/auth/signup", {
         username,
         email,
         password,
       });
 
-      localStorage.setItem('token', response.data.token);
-      navigate('/dashboard');
+      localStorage.setItem("token", response.data.token);
+      navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to sign up');
+      setError(err.response?.data?.error || "Failed to sign up");
     }
   };
 
   return (
-    <div>
+    <div className="auth-container">
       <h1>Sign Up</h1>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="error">{error}</p>}
       <input
         type="text"
         placeholder="Username"
