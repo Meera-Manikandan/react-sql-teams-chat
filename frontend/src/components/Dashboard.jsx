@@ -79,13 +79,16 @@ function Dashboard() {
     }
   };
 
-  const handleDeletePost = async (postId) => {
+  const handleDeletePost = async (postId, userId) => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
 
     try {
-      const response = await fetch(`http://localhost:5001/posts/${postId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:5001/posts/delete-post/${postId}/${userId}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
         alert("Post deleted successfully");
@@ -235,7 +238,9 @@ function Dashboard() {
               {user?.id === post.user_id && (
                 <>
                   <span onClick={() => handleEditPost(post)}>Modify</span>
-                  <span onClick={() => handleDeletePost(post.id)}>Delete</span>
+                  <span onClick={() => handleDeletePost(post.id, post.user_id)}>
+                    Delete
+                  </span>
                 </>
               )}
             </div>
@@ -247,7 +252,8 @@ function Dashboard() {
         <button className="delete-btn" onClick={handleDeleteAccount}>
           Delete Account
         </button>
-        <button className="logout-btn"
+        <button
+          className="logout-btn"
           onClick={() => {
             localStorage.clear();
             navigate("/");

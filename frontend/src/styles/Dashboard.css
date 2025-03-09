@@ -107,8 +107,8 @@ button:hover {
 
 .post-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
   margin-top: 10px;
 }
 .post-actions span {
@@ -116,6 +116,7 @@ button:hover {
   cursor: pointer;
   font-weight: bold;
   transition: color 0.3s;
+  padding-right: 10px;
 }
 
 .post-actions span:hover {

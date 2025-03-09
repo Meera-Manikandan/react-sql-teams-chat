@@ -12,6 +12,6 @@ router.get("/", postController.getAllPosts);
 router.post("/mark-read/:postid/:userid", postController.markAsRead);
 router.post("/toggle-like/:postid", postController.likePost);
 router.put("/modify-post/:id", postController.modifyPost);
-router.delete("/delete-post/:id", postController.deletePost);
+router.delete("/delete-post/:postid/:userid", postController.deletePost);
 
 module.exports = router;

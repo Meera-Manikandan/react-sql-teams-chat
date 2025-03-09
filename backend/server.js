@@ -18,4 +18,4 @@ app.use("/uploads", express.static("uploads")); // Serve uploaded images
 const PORT = process.env.PORT || 5001;
 app.use(cors({ origin: "http://localhost:5173" }));
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Backend API running on port ${PORT}`));

@@ -126,8 +126,8 @@ exports.modifyPost = (req, res) => {
 
 // Delete a post (Only the author can delete)
 exports.deletePost = (req, res) => {
-  const postId = req.params.id;
-  const userId = req.user.id;
+  const postId = req.params.postid;
+  const userId = req.params.userid;
 
   db.query(
     "SELECT user_id FROM posts WHERE id = ?",
@@ -138,15 +138,28 @@ exports.deletePost = (req, res) => {
       if (results.length === 0)
         return res.status(404).json({ message: "Post not found" });
 
-      if (results[0].user_id !== userId) {
+      //if (results[0].user_id !== userId) {
+      if (parseInt(results[0].user_id) !== parseInt(userId)) {
         return res.status(403).json({ message: "Unauthorized action" });
       }
 
-      db.query("DELETE FROM posts WHERE id = ?", [postId], (err, result) => {
-        if (err) return res.status(500).json({ error: "Database error" });
+      db.query(
+        "DELETE FROM read_posts WHERE post_id = ?",
+        [postId],
+        (err, result) => {
+          if (err) return res.status(500).json({ error: "Database error" });
 
-        res.json({ message: "Post deleted successfully" });
-      });
+          db.query(
+            "DELETE FROM posts WHERE id = ?",
+            [postId],
+            (err, result) => {
+              if (err) return res.status(500).json({ error: "Database error" });
+
+              res.json({ message: "Post deleted successfully" });
+            }
+          );
+        }
+      );
     }
   );
 };
