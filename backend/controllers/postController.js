@@ -96,8 +96,10 @@ exports.likePost = (req, res) => {
 // Modify a post
 exports.modifyPost = (req, res) => {
   const { content } = req.body;
-  const postId = req.params.id;
-  const userId = req.user.id;
+
+  const postId = req.params.postid;
+  const userId = req.params.userid;
+
   db.query(
     "SELECT user_id FROM posts WHERE id = ?",
     [postId],
@@ -107,7 +109,7 @@ exports.modifyPost = (req, res) => {
       if (results.length === 0)
         return res.status(404).json({ message: "Post not found" });
 
-      if (results[0].user_id !== userId) {
+      if (parseInt(results[0].user_id) !== parseInt(userId)) {
         return res.status(403).json({ message: "Unauthorized action" });
       }
 

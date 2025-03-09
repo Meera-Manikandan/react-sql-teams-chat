@@ -120,6 +120,7 @@ function Dashboard() {
   };
 
   const handleMarkAsRead = async (postId, userId) => {
+    if (e.target.tagName === "BUTTON") return;
     try {
       await fetch(`http://localhost:5001/posts/mark-read/${postId}/${userId}`, {
         method: "POST",
@@ -141,10 +142,14 @@ function Dashboard() {
     setEditContent(post.content);
   };
 
-  const handleSaveEdit = async (postId) => {
+  const handleSaveEdit = async (e, postId, userId) => {
+    //e.stopPropagation(); // Prevent the click from triggering the parent onClick
+    e.preventDefault(); // Prevent the default action for the button
+    e.stopPropagation(); // Stop the event from propagating to the parent .post-card div
+
     try {
       const response = await fetch(
-        `http://localhost:5001/posts/modify-post/${postId}`,
+        `http://localhost:5001/posts/modify-post/${postId}/${userId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -206,7 +211,7 @@ function Dashboard() {
           <div
             key={post.id}
             className={`post-card ${post.read ? "read" : "unread"}`}
-            onClick={() => handleMarkAsRead(post.id, post.user_id)}
+            onClick={(e) => handleMarkAsRead(post.id, post.user_id)}
           >
             <h4>{post.username}</h4>
             {editingPost === post.id ? (
@@ -215,7 +220,11 @@ function Dashboard() {
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
                 />
-                <button onClick={() => handleSaveEdit(post.id)}>Save</button>
+                <button
+                  onClick={(e) => handleSaveEdit(e, post.id, post.user_id)}
+                >
+                  Save
+                </button>
               </div>
             ) : (
               <>
