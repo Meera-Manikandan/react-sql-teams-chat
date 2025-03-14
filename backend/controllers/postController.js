@@ -39,8 +39,9 @@ exports.markAsRead = (req, res) => {
   const post_id = req.params.postid;
   const user_id = req.params.userid;
 
-  const sql =
-    "INSERT INTO read_posts (user_id, post_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE post_id = post_id";
+  const sql = `
+    INSERT IGNORE INTO read_posts (user_id, post_id) VALUES (?, ?)
+  `;
   db.query(sql, [user_id, post_id], (err, result) => {
     if (err) return res.status(500).json({ error: "Database error" });
 
@@ -50,29 +51,21 @@ exports.markAsRead = (req, res) => {
 
 // Fetch all posts but exclude those marked as read by the user
 exports.getAllPosts = (req, res) => {
-  const userId = req.query.user_id; // Pass user_id in query params
-
-  const sqlBackup = `
-    SELECT posts.id, posts.user_id, posts.content, posts.image_url, posts.created_at, users.username
-    FROM posts
-    JOIN users ON posts.user_id = users.id
-    LEFT JOIN read_posts ON posts.id = read_posts.post_id AND read_posts.user_id = ?
-    WHERE read_posts.id IS NULL
-    ORDER BY posts.created_at DESC
-  `;
+  const userId = req.params.userid; // Pass user_id in query param
 
   const sql = `
   SELECT posts.id, posts.user_id, posts.content, posts.image_url, posts.created_at, users.username,
-    IF(read_posts.id IS NOT NULL, 1, 0) AS read_status
+    IF(read_posts.id IS NOT NULL, 1, 0) AS read_status,
+    IF(likes.user_id IS NOT NULL, 1, 0) AS liked
   FROM posts
   JOIN users ON posts.user_id = users.id
   LEFT JOIN read_posts ON posts.id = read_posts.post_id AND read_posts.user_id = ?
+  LEFT JOIN likes ON posts.id = likes.post_id AND likes.user_id = ?
   ORDER BY posts.created_at DESC
 `;
 
-  db.query(sql, [userId], (err, results) => {
+  db.query(sql, [userId, userId], (err, results) => {
     if (err) return res.status(500).json({ error: "Database error" });
-
     res.json(results);
   });
 };
@@ -124,6 +117,40 @@ exports.modifyPost = (req, res) => {
       );
     }
   );
+};
+
+// Toggle Like API
+exports.toggleLike = (req, res) => {
+  const post_id = req.params.postid;
+  const user_id = req.body.user_id;
+
+  if (!post_id || !user_id) {
+    return res.status(400).json({ error: "Post ID and User ID are required" });
+  }
+
+  // Check if the user has already liked the post
+  const checkLikeSQL = "SELECT * FROM likes WHERE user_id = ? AND post_id = ?";
+  db.query(checkLikeSQL, [user_id, post_id], (err, results) => {
+    if (err) return res.status(500).json({ error: "Database error" });
+
+    if (results.length > 0) {
+      // If already liked, remove the like (unlike)
+      const deleteLikeSQL =
+        "DELETE FROM likes WHERE user_id = ? AND post_id = ?";
+      db.query(deleteLikeSQL, [user_id, post_id], (err, result) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+        res.json({ message: "Like removed", liked: false });
+      });
+    } else {
+      // If not liked, add the like
+      const insertLikeSQL =
+        "INSERT INTO likes (user_id, post_id) VALUES (?, ?)";
+      db.query(insertLikeSQL, [user_id, post_id], (err, result) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+        res.json({ message: "Post liked", liked: true });
+      });
+    }
+  });
 };
 
 // Delete a post (Only the author can delete)

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Dashboard.css";
-
 function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -32,14 +31,20 @@ function Dashboard() {
 
   const fetchPosts = async (userId) => {
     try {
-      const response = await fetch("http://localhost:5001/posts");
+      const response = await fetch(`http://localhost:5001/posts/${userId}`);
       const data = await response.json();
 
-      const updatedPosts = data.map((post) => ({
-        ...post,
-        read: post.read_status === 1,
-        liked: post.likes?.includes(userId) || false,
-      }));
+      const updatedPosts = data.map((post) => {
+        const isLiked = post.liked === 1; // Correctly checking if post is liked
+        console.log(`Post ID: ${post.id}, Liked by user: ${isLiked}`);
+
+        return {
+          ...post,
+          uniqueKey: post.id || `temp-${index}`,
+          read: post.read_status === 1,
+          liked: isLiked,
+        };
+      });
 
       setPosts(updatedPosts);
     } catch (error) {
@@ -103,23 +108,32 @@ function Dashboard() {
 
   const handleToggleLike = async (postId) => {
     try {
-      await fetch(`http://localhost:5001/posts/toggle-like/${postId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: user.id }),
-      });
-
-      setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post.id === postId ? { ...post, liked: !post.liked } : post
-        )
+      const response = await fetch(
+        `http://localhost:5001/posts/toggle-like/${postId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: user.id }),
+        }
       );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post.id === postId ? { ...post, liked: data.liked } : post
+          )
+        );
+      } else {
+        alert(data.error || "Failed to toggle like");
+      }
     } catch (error) {
       console.error("Error toggling like:", error);
     }
   };
 
-  const handleMarkAsRead = async (postId, userId) => {
+  const handleMarkAsRead = async (e, postId, userId) => {
     if (e.target.tagName === "BUTTON") return;
     try {
       await fetch(`http://localhost:5001/posts/mark-read/${postId}/${userId}`, {
@@ -143,7 +157,6 @@ function Dashboard() {
   };
 
   const handleSaveEdit = async (e, postId, userId) => {
-    //e.stopPropagation(); // Prevent the click from triggering the parent onClick
     e.preventDefault(); // Prevent the default action for the button
     e.stopPropagation(); // Stop the event from propagating to the parent .post-card div
 
@@ -211,7 +224,7 @@ function Dashboard() {
           <div
             key={post.id}
             className={`post-card ${post.read ? "read" : "unread"}`}
-            onClick={(e) => handleMarkAsRead(post.id, post.user_id)}
+            onClick={(e) => handleMarkAsRead(e, post.id, post.user_id)}
           >
             <h4>{post.username}</h4>
             {editingPost === post.id ? (

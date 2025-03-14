@@ -9,9 +9,9 @@ router.post(
   postController.uploadFile,
   postController.createPost
 );
-router.get("/", postController.getAllPosts);
+router.get("/:userid", postController.getAllPosts);
 router.post("/mark-read/:postid/:userid", postController.markAsRead);
-router.post("/toggle-like/:postid", postController.likePost);
+router.post("/toggle-like/:postid", postController.toggleLike);
 router.put("/modify-post/:postid/:userid", postController.modifyPost);
 router.delete("/delete-post/:postid/:userid", postController.deletePost);
 
