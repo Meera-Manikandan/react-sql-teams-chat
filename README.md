@@ -29,7 +29,7 @@ Step 7: Install Dependencies
 
     npm install
 
-Step 8: Start Server, make sure check your port no on the terminal it may be different for you system.
+Step 8: Start Server, make sure check your port no on the terminal it may be different for your system.
 
     npm run dev
 
@@ -37,13 +37,23 @@ Step 9: You can now see app on port 5173
 
     local --> http://localhost:5173/
 
-# Back end
+# Database setup
 
-Install DataBase - https://dev.mysql.com/doc/mysql-getting-started/en/
+Step 1: Install SQL DataBase locally - https://dev.mysql.com/doc/mysql-getting-started/en/
+
+Step 2: Open Terminal, execute Database schema file which creates tables, PRIMARY KEY and FOREIGN KEY
+
+    mysql -u root -p chat_app < chat_app_database_schema.sql
+
+# Backend API Setup
 
 Step 1: Once you follow steps till 5 from frontend steps, we will need to enter inside backend folder.
 cd backend
 
-Step 2: Connect to SQL database
+Step 2: Install Dependencies
+
+    npm install
+
+Step 3: Start Backend API server at Port 5001
 
         node server.js
