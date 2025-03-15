@@ -18,6 +18,12 @@
   margin-bottom: 20px;
 }
 
+.auth-logo {
+  width: 80%; /* Reduce from 80px to 60px */
+  height: auto;
+  margin-bottom: 15px;
+}
+
 /* Input Fields */
 .auth-container input {
   width: 100%;
@@ -42,6 +48,7 @@
 .auth-container button {
   width: 100%;
   padding: 12px;
+  margin: 16px;
   background: #004085; /* Darker blue for better contrast */
   border: none;
   color: #ffffff;

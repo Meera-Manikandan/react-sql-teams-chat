@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Dashboard.css";
-import logo from "../assets/logo.png";
+// import logo from "../assets/logo.png";
 function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -216,7 +216,7 @@ function Dashboard() {
           className="app-logo-container"
           style={{ display: "flex", alignItems: "center", gap: "10px" }}
         >
-          <img src={logo} alt="App Logo" className="app-logo" />
+          {/* <img src={logo} alt="App Logo" className="app-logo" /> */}
           <span className="app-name">Groupomania</span>
         </div>
 
