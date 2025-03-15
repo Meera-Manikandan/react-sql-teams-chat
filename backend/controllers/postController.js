@@ -1,22 +1,32 @@
 const db = require("../config/db");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
-// Multer configuration for file uploads
+// Define the uploads directory correctly
+const uploadPath = path.join(__dirname, "../uploads");
+
+// Ensure the folder exists before storing files
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+}
+
+// Configure multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Save files in the 'uploads' folder
+    cb(null, uploadPath); // Store files in the uploads folder
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Rename file with timestamp
+    cb(null, Date.now() + "-" + file.originalname); // Unique filename
   },
 });
+
 const upload = multer({ storage });
 
-// Middleware to handle file upload
-exports.uploadFile = upload.single("image");
+// Middleware to handle file uploads
+exports.uploadFile = upload.single("image"); // Ensure frontend sends the file under key "image"
 
-// Save post to database
+// Controller to create a new post
 exports.createPost = (req, res) => {
   const { user_id, content } = req.body;
   const image_url = req.file ? `/uploads/${req.file.filename}` : null;
@@ -33,6 +43,24 @@ exports.createPost = (req, res) => {
     res.status(201).json({ message: "Post created successfully" });
   });
 };
+
+// Save post to database
+/*exports.createPost = (req, res) => {
+  const { user_id, content } = req.body;
+  const image_url = req.file ? `/uploads/${req.file.filename}` : null;
+
+  if (!user_id || (!content && !image_url)) {
+    return res.status(400).json({ error: "Content or image is required" });
+  }
+
+  const sql =
+    "INSERT INTO posts (user_id, content, image_url) VALUES (?, ?, ?)";
+  db.query(sql, [user_id, content, image_url], (err, result) => {
+    if (err) return res.status(500).json({ error: "Database error" });
+
+    res.status(201).json({ message: "Post created successfully" });
+  });
+};*/
 
 // Mark a post as read
 exports.markAsRead = (req, res) => {

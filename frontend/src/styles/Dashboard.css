@@ -139,8 +139,24 @@ button:hover {
 
 .post-image {
   max-width: 100%;
+  height: auto;
+  display: block;
   margin-top: 10px;
-  border-radius: 5px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.app-logo {
+  max-width: 100px; /* Adjust as needed */
+  height: auto;
+  margin-top: 10px;
+  display: block; /* Prevents extra spacing */
+}
+
+.app-logo-container {
+  display: flex;
+  align-items: center; /* Align vertically */
+  gap: 10px; /* Space between logo and text */
 }
 
 /* Logout & Delete Account */

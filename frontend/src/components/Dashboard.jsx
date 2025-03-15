@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Dashboard.css";
+import logo from "../assets/logo.png";
 function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -181,12 +182,15 @@ function Dashboard() {
     }
   };
 
-  // Handle account deletion
   const handleDeleteAccount = async () => {
     if (window.confirm("Are you sure you want to delete your account?")) {
       try {
-        const response = await fetch(`http://localhost:5001/users/${user.id}`, {
+        const response = await fetch("http://localhost:5001/auth/delete-user", {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: user.id }), // Send user ID in request body
         });
 
         if (response.ok) {
@@ -194,17 +198,30 @@ function Dashboard() {
           localStorage.clear();
           navigate("/login");
         } else {
-          alert("Failed to delete account");
+          const data = await response.json();
+          alert(data.error || "Failed to delete account");
         }
       } catch (error) {
         console.error("Error deleting account:", error);
+        alert("Something went wrong. Please try again.");
       }
     }
   };
 
   return (
     <div className="dashboard-container">
-      <h1>Welcome, {user?.username || "Guest"}!</h1>
+      {/* Header with Logo and App Name */}
+      <div className="dashboard-header">
+        <div
+          className="app-logo-container"
+          style={{ display: "flex", alignItems: "center", gap: "10px" }}
+        >
+          <img src={logo} alt="App Logo" className="app-logo" />
+          <span className="app-name">Groupomania</span>
+        </div>
+
+        <h1>Welcome, {user?.username || "Guest"}!</h1>
+      </div>
 
       {/* Post Creation Form */}
       <form className="post-form" onSubmit={handlePostSubmit}>
