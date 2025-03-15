@@ -208,13 +208,16 @@ function Dashboard() {
 
       {/* Post Creation Form */}
       <form className="post-form" onSubmit={handlePostSubmit}>
+        <label htmlFor="postContent">What's in your mind:</label>
         <textarea
+          id="postContent"
           value={postContent}
           onChange={(e) => setPostContent(e.target.value)}
           placeholder="Write something..."
           rows="3"
         ></textarea>
-        <input type="file" onChange={handleFileChange} />
+        <label htmlFor="imageUpload">Would you like to share a file?</label>
+        <input type="file" id="imageUpload" onChange={handleFileChange} />
         <button type="submit">Post</button>
       </form>
 
