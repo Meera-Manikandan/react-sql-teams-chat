@@ -5,35 +5,24 @@ This is a full stack project for building a organizational Chat platform using R
 # Front-end:
 
 Steps to set up ReactJS with Vite:
-Step 1: Install NodeJs, If you haven't installed NodeJs, download it from the official website.
 
-Step 2: Create a new Vite Project
-
-    npm create vite@latest react-sql-teams-chat --template
-
-Step 3: Select a framework: select the React framework here using the downward arrow key.
-
-    React
-
-Step 4: Select Variant: choose any variant of your choice using the downward arrow key,i.e: choose JavaScript
-
-Step 5: Now, switch to react-sql-teams-chat directory
+Step 1: Now, switch to react-sql-teams-chat directory
 
     cd react-sql-teams-chat
 
-Step 6: Switch inside frontend folder - since this app is a combination of UI and BE.
+Step 2: Switch inside frontend folder - since this app is a combination of UI and BE.
 
     cd frontend
 
-Step 7: Install Dependencies
+Step 3: Install Dependencies
 
     npm install
 
-Step 8: Start Server, make sure check your port no on the terminal it may be different for your system.
+Step 4: Start Server, make sure check your port no on the terminal it may be different for your system.
 
     npm run dev
 
-Step 9: You can now see app on port 5173
+Step 5: You can now see app on port 5173
 
     local --> http://localhost:5173/
 
@@ -48,7 +37,10 @@ Step 2: Open Terminal, execute Database schema file which creates tables, PRIMAR
 # Backend API Setup
 
 Step 1: Once you follow steps till 5 from frontend steps, we will need to enter inside backend folder.
-cd backend
+        
+        cd backend
+
+Step 2: Create .env file for configuration - refer .env.example for the variables used, replace the placeholder values
 
 Step 2: Install Dependencies
 
