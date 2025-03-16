@@ -138,25 +138,23 @@ button:hover {
 }
 
 .post-image {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin-top: 10px;
-  border-radius: 8px;
+  width: 200px;
+  height: 200px;
   object-fit: cover;
+  border-radius: 8px;
 }
 
 .app-logo {
-  max-width: 100px; /* Adjust as needed */
+  width: 40%;
   height: auto;
-  margin-top: 10px;
-  display: block; /* Prevents extra spacing */
+  margin: 10px 0;
+  padding: 10px;
+  object-fit: contain;
 }
 
 .app-logo-container {
   display: flex;
-  align-items: center; /* Align vertically */
-  gap: 10px; /* Space between logo and text */
+  align-items: center;
 }
 
 /* Logout & Delete Account */
