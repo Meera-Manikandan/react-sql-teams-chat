@@ -75,27 +75,6 @@ exports.login = (req, res) => {
   );
 };
 
-/*
-exports.deleteUser = (req, res) => {
-  const userId = req.body.id; // User ID sent from frontend
-
-  if (!userId) {
-    return res.status(400).json({ error: "User ID is required" });
-  }
-
-  db.query("DELETE FROM users WHERE id = ?", [userId], (err, result) => {
-    if (err) {
-      console.error("Database error:", err);
-      return res.status(500).json({ error: "Database error" });
-    }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.status(200).json({ message: "User deleted successfully" });
-  });
-};*/
-
 exports.deleteUser = (req, res) => {
   const userId = req.body.id;
 
@@ -106,7 +85,7 @@ exports.deleteUser = (req, res) => {
   db.beginTransaction((err) => {
     if (err) return res.status(500).json({ error: "Transaction error" });
 
-    // Step 1: Delete related data first
+    //  Delete related data first
     db.query(
       "DELETE FROM read_posts WHERE post_id IN (SELECT id FROM posts WHERE user_id = ?)",
       [userId],
@@ -122,7 +101,7 @@ exports.deleteUser = (req, res) => {
               res.status(500).json({ error: "Failed to delete user posts" })
             );
 
-          // Step 2: Delete the user
+          // Delete the user
           db.query(
             "DELETE FROM users WHERE id = ?",
             [userId],

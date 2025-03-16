@@ -15,8 +15,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/auth", authRoutes);
 app.use("/posts", postRoutes);
-//app.use("/uploads", express.static("uploads")); // Serve uploaded images
-// Serve uploaded files statically
 
 // Ensure the uploads directory exists
 const uploadDir = path.join(__dirname, "uploads");

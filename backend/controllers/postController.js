@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Middleware to handle file uploads
-exports.uploadFile = upload.single("image"); // Ensure frontend sends the file under key "image"
+exports.uploadFile = upload.single("image"); // frontend sends the file under key "image"
 
 // Controller to create a new post
 exports.createPost = (req, res) => {
@@ -43,24 +43,6 @@ exports.createPost = (req, res) => {
     res.status(201).json({ message: "Post created successfully" });
   });
 };
-
-// Save post to database
-/*exports.createPost = (req, res) => {
-  const { user_id, content } = req.body;
-  const image_url = req.file ? `/uploads/${req.file.filename}` : null;
-
-  if (!user_id || (!content && !image_url)) {
-    return res.status(400).json({ error: "Content or image is required" });
-  }
-
-  const sql =
-    "INSERT INTO posts (user_id, content, image_url) VALUES (?, ?, ?)";
-  db.query(sql, [user_id, content, image_url], (err, result) => {
-    if (err) return res.status(500).json({ error: "Database error" });
-
-    res.status(201).json({ message: "Post created successfully" });
-  });
-};*/
 
 // Mark a post as read
 exports.markAsRead = (req, res) => {
