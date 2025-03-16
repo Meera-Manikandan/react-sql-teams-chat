@@ -77,13 +77,31 @@
   outline-offset: 3px;
 }
 
+.home-link {
+  display: block;
+  width: fit-content;
+  font-size: 1rem;
+  color: #ffffff;
+  background: #004085;
+  padding: 8px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.home-link:hover {
+  background: #002752;
+}
+
 /* Error Message */
 .error {
-  color: #ff6b6b;
+  color: #7d0000;
   font-size: 1rem;
-  background: rgba(255, 0, 0, 0.2);
+  background: #f8d7da;
   padding: 8px;
   border-radius: 5px;
   margin-bottom: 15px;
   text-align: center;
+  border: 1px solid #dc3545;
 }

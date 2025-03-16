@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { validateEmail, validatePassword } from "../../utils/validation";
 import logo from "../../assets/icon-left-font-monochrome-white.svg";
 import "../../styles/Auth.css";
@@ -49,29 +49,34 @@ function Login() {
   };
 
   return (
-    <div className="auth-container">
-      <span>
-        <img src={logo} alt="Company Logo" className="auth-logo" />
-      </span>
-      <h1>Login</h1>
-      {error && <p className="error">{error}</p>}
-      <label htmlFor="email">Enter Email</label>
-      <input
-        id="email"
-        type="email"
-        placeholder="Enter your email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <label htmlFor="password">Enter Password</label>
-      <input
-        id="password"
-        type="password"
-        placeholder="Enter your password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={handleLogin}>Login</button>
+    <div className="auth-page">
+      <Link to="/" className="home-link">
+        Home
+      </Link>
+      <div className="auth-container">
+        <span>
+          <img src={logo} alt="Company Logo" className="auth-logo" />
+        </span>
+        <h1>Login</h1>
+        {error && <p className="error">{error}</p>}
+        <label htmlFor="email">Enter Email</label>
+        <input
+          id="email"
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <label htmlFor="password">Enter Password</label>
+        <input
+          id="password"
+          type="password"
+          placeholder="Enter your password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button onClick={handleLogin}>Login</button>
+      </div>
     </div>
   );
 }
